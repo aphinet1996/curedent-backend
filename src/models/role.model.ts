@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { UserRole } from '../types/user.types';
 
 // ลิสต์ของ permissions ทั้งหมดที่รองรับ
@@ -77,7 +77,7 @@ export const validPermissions = [
 export type Permission = typeof validPermissions[number];
 
 /**
- * Interface สำหรับ Role
+ * Interface สำหรับ Role document
  */
 export interface IRole extends Document {
   name: string;
@@ -89,6 +89,13 @@ export interface IRole extends Document {
   createdBy?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+}
+
+/**
+ * Interface สำหรับ Role model (static methods)
+ */
+export interface IRoleModel extends Model<IRole> {
+  getDefaultPermissions(role: UserRole): Permission[];
 }
 
 const roleSchema = new Schema<IRole>(
@@ -128,7 +135,7 @@ const roleSchema = new Schema<IRole>(
     clinicId: {
       type: Schema.Types.ObjectId,
       ref: 'Clinic',
-      required: function() {
+      required: function(this: IRole) {
         return !this.isSystem;
       }
     },
@@ -150,7 +157,7 @@ roleSchema.index({ isSystem: 1 });
 roleSchema.index({ clinicId: 1 });
 
 // Virtual for role level (for hierarchy)
-roleSchema.virtual('level').get(function() {
+roleSchema.virtual('level').get(function(this: IRole) {
   const roleLevels: Record<string, number> = {
     'superadmin': 5,
     'owner': 4,
@@ -163,7 +170,7 @@ roleSchema.virtual('level').get(function() {
 });
 
 // Middleware: ป้องกันการลบ system roles
-roleSchema.pre('deleteOne', { document: true }, function(next) {
+roleSchema.pre('deleteOne', { document: true }, function(this: IRole, next) {
   if (this.isSystem) {
     return next(new Error('ไม่สามารถลบ system role ได้'));
   }
@@ -228,7 +235,8 @@ roleSchema.statics.getDefaultPermissions = function(role: UserRole): Permission[
   return defaultPermissions[role] || [];
 };
 
-const Role = mongoose.model<IRole>('Role', roleSchema);
+// สร้าง model ด้วย generic types ที่ถูกต้อง
+const Role = mongoose.model<IRole, IRoleModel>('Role', roleSchema);
 
 // สร้าง default system roles ถ้ายังไม่มี
 export const createDefaultRoles = async (): Promise<void> => {
