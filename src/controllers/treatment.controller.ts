@@ -3,6 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { TreatmentService } from '../services/treatment.service';
 import { toTreatmentResponse } from '../types/treatment.types';
 import { UserRole } from '../types/user.types';
+import { hasClinicAccess } from '../utils/mogoose.utils';
 
 const treatmentService = new TreatmentService();
 
@@ -13,7 +14,7 @@ export const getAllTreatments = catchAsync(async (req: Request, res: Response) =
   if (req.query.includeVat !== undefined) filter.includeVat = req.query.includeVat === 'true';
   if (req.query.minPrice) filter.price = { ...filter.price, $gte: parseFloat(req.query.minPrice as string) };
   if (req.query.maxPrice) filter.price = { ...filter.price, $lte: parseFloat(req.query.maxPrice as string) };
-  
+
   if (req.query.search) {
     const searchRegex = new RegExp(req.query.search as string, 'i');
     filter.name = searchRegex;
@@ -62,7 +63,7 @@ export const getTreatmentById = catchAsync(async (req: Request, res: Response, n
   }
 
   if (req.user!.roles !== UserRole.SUPER_ADMIN &&
-      treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
+    treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
     return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลการรักษานี้', 403));
   }
 
@@ -135,9 +136,13 @@ export const updateTreatment = catchAsync(async (req: Request, res: Response, ne
     return next(new AppError('ไม่พบข้อมูลการรักษานี้', 404));
   }
 
-  if (req.user!.roles !== UserRole.SUPER_ADMIN &&
-      treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
-    return next(new AppError('คุณไม่มีสิทธิ์แก้ไขข้อมูลการรักษานี้', 403));
+  // if (req.user!.roles !== UserRole.SUPER_ADMIN &&
+  //     treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
+  //   return next(new AppError('คุณไม่มีสิทธิ์แก้ไขข้อมูลการรักษานี้', 403));
+  // }
+
+  if (!hasClinicAccess(req.user!.roles, req.user!.clinicId, treatment.clinicId)) {
+    return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลสาขานี้', 403));
   }
 
   const updatedTreatment = await treatmentService.updateTreatment(treatmentId, updateData);
@@ -159,9 +164,12 @@ export const deleteTreatment = catchAsync(async (req: Request, res: Response, ne
     return next(new AppError('ไม่พบข้อมูลการรักษานี้', 404));
   }
 
-  if (req.user!.roles !== UserRole.SUPER_ADMIN &&
-      treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
-    return next(new AppError('คุณไม่มีสิทธิ์ลบการรักษานี้', 403));
+  // if (req.user!.roles !== UserRole.SUPER_ADMIN &&
+  //   treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
+  //   return next(new AppError('คุณไม่มีสิทธิ์ลบการรักษานี้', 403));
+  // }
+  if (!hasClinicAccess(req.user!.roles, req.user!.clinicId, treatment.clinicId)) {
+    return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลสาขานี้', 403));
   }
 
   await treatmentService.deleteTreatment(treatmentId);
@@ -183,7 +191,7 @@ export const calculateFees = catchAsync(async (req: Request, res: Response, next
   }
 
   if (req.user!.roles !== UserRole.SUPER_ADMIN &&
-      treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
+    treatment.clinicId.toString() !== req.user!.clinicId?.toString()) {
     return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลการรักษานี้', 403));
   }
 
@@ -212,7 +220,7 @@ export const getTreatmentStats = catchAsync(async (req: Request, res: Response, 
   }
 
   if (req.user!.roles !== UserRole.SUPER_ADMIN &&
-      clinicId !== req.user!.clinicId?.toString()) {
+    clinicId !== req.user!.clinicId?.toString()) {
     return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลสถิติของคลินิกนี้', 403));
   }
 
@@ -235,7 +243,7 @@ export const getTreatmentsByClinicWithCalculations = catchAsync(async (req: Requ
   }
 
   if (req.user!.roles !== UserRole.SUPER_ADMIN &&
-      clinicId !== req.user!.clinicId?.toString()) {
+    clinicId !== req.user!.clinicId?.toString()) {
     return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลการรักษาของคลินิกนี้', 403));
   }
 

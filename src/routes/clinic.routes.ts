@@ -1,4 +1,3 @@
-// routes/clinic.routes.ts
 import { Router } from 'express';
 import { validate } from '../middlewares/validation.middleware';
 import { authenticateToken } from '../middlewares/auth.middleware';

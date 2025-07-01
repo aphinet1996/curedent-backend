@@ -2,7 +2,30 @@ import Joi from 'joi';
 import { commonValidations } from '../middlewares/validation.middleware';
 
 /**
- * Schema สำหรับตรวจสอบข้อมูลหลายภาษา
+ * Schema สำหรับตรวจสอบข้อมูลหลายภาษา (รองรับทั้ง string และ object)
+ */
+const flexibleMultilingualSchema = (maxLength: number = 100, required: boolean = true) => {
+    const baseSchema = Joi.alternatives().try(
+        // รองรับ string ธรรมดา (backward compatibility)
+        Joi.string().trim().max(maxLength),
+        // รองรับ multilingual object
+        Joi.object({
+            th: Joi.string().required().trim().max(maxLength).messages({
+                'string.empty': 'กรุณาระบุข้อมูลภาษาไทย',
+                'string.max': `ข้อมูลภาษาไทยต้องไม่เกิน ${maxLength} ตัวอักษร`,
+                'any.required': 'กรุณาระบุข้อมูลภาษาไทย',
+            }),
+            en: Joi.string().trim().max(maxLength).allow('').messages({
+                'string.max': `ข้อมูลภาษาอังกฤษต้องไม่เกิน ${maxLength} ตัวอักษร`,
+            })
+        })
+    );
+
+    return required ? baseSchema.required() : baseSchema.allow(null);
+};
+
+/**
+ * Schema สำหรับตรวจสอบข้อมูลหลายภาษา (แบบเดิม - ใช้สำหรับ required fields)
  */
 const multilingualTextSchema = Joi.object({
     th: Joi.string().required().trim().max(100).messages({
@@ -18,16 +41,7 @@ const multilingualTextSchema = Joi.object({
 /**
  * Schema สำหรับตรวจสอบคำนำหน้าชื่อ
  */
-const titlePrefixSchema = Joi.object({
-    th: Joi.string().required().trim().max(20).messages({
-        'string.empty': 'กรุณาระบุคำนำหน้าชื่อภาษาไทย',
-        'string.max': 'คำนำหน้าชื่อต้องไม่เกิน {#limit} ตัวอักษร',
-        'any.required': 'กรุณาระบุคำนำหน้าชื่อภาษาไทย',
-    }),
-    en: Joi.string().trim().max(20).allow('').messages({
-        'string.max': 'คำนำหน้าชื่อภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-});
+const titlePrefixSchema = flexibleMultilingualSchema(20, true);
 
 /**
  * Schema สำหรับตรวจสอบชื่อ
@@ -58,106 +72,44 @@ const lastNameSchema = Joi.object({
 });
 
 /**
- * Schema สำหรับตรวจสอบสัญชาติ (แก้ไขเป็น multilingual)
+ * Schema สำหรับตรวจสอบสัญชาติ (รองรับทั้ง string และ multilingual)
  */
-const nationalitySchema = Joi.object({
-    th: Joi.string().required().trim().max(50).messages({
-        'string.empty': 'กรุณาระบุสัญชาติภาษาไทย',
-        'string.max': 'สัญชาติต้องไม่เกิน {#limit} ตัวอักษร',
-        'any.required': 'กรุณาระบุสัญชาติภาษาไทย',
-    }),
-    en: Joi.string().trim().max(50).allow('').messages({
-        'string.max': 'สัญชาติภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-});
+const nationalitySchema = flexibleMultilingualSchema(50, true);
 
 /**
- * Schema สำหรับตรวจสอบเพศ (แก้ไขเป็น multilingual)
+ * Schema สำหรับตรวจสอบเพศ (รองรับทั้ง string และ multilingual)
  */
-const genderSchema = Joi.object({
-    th: Joi.string().required().trim().max(20).messages({
-        'string.empty': 'กรุณาระบุเพศภาษาไทย',
-        'string.max': 'เพศต้องไม่เกิน {#limit} ตัวอักษร',
-        'any.required': 'กรุณาระบุเพศภาษาไทย',
-    }),
-    en: Joi.string().trim().max(20).allow('').messages({
-        'string.max': 'เพศภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-});
+const genderSchema = flexibleMultilingualSchema(20, true);
 
 /**
- * Schema สำหรับตรวจสอบประเภทผู้ป่วย (แก้ไขเป็น multilingual)
+ * Schema สำหรับตรวจสอบประเภทผู้ป่วย (รองรับทั้ง string และ multilingual)
  */
-const patientTypeSchema = Joi.object({
-    th: Joi.string().required().trim().max(50).messages({
-        'string.empty': 'กรุณาระบุประเภทผู้ป่วยภาษาไทย',
-        'string.max': 'ประเภทผู้ป่วยต้องไม่เกิน {#limit} ตัวอักษร',
-        'any.required': 'กรุณาระบุประเภทผู้ป่วยภาษาไทย',
-    }),
-    en: Joi.string().trim().max(50).allow('').messages({
-        'string.max': 'ประเภทผู้ป่วยภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-});
+const patientTypeSchema = flexibleMultilingualSchema(50, true);
 
 /**
- * Schema สำหรับตรวจสอบกรุ๊ปเลือด (แก้ไขเป็น multilingual - optional)
+ * Schema สำหรับตรวจสอบกรุ๊ปเลือด (รองรับทั้ง string และ multilingual - optional)
  */
-const bloodGroupSchema = Joi.object({
-    th: Joi.string().trim().max(10).allow('').messages({
-        'string.max': 'กรุ๊ปเลือดต้องไม่เกิน {#limit} ตัวอักษร',
-    }),
-    en: Joi.string().trim().max(10).allow('').messages({
-        'string.max': 'กรุ๊ปเลือดภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-}).allow(null);
+const bloodGroupSchema = flexibleMultilingualSchema(10, false);
 
 /**
- * Schema สำหรับตรวจสอบอาชีพ (แก้ไขเป็น multilingual - optional)
+ * Schema สำหรับตรวจสอบอาชีพ (รองรับทั้ง string และ multilingual - optional)
  */
-const occupationSchema = Joi.object({
-    th: Joi.string().trim().max(100).allow('').messages({
-        'string.max': 'อาชีพต้องไม่เกิน {#limit} ตัวอักษร',
-    }),
-    en: Joi.string().trim().max(100).allow('').messages({
-        'string.max': 'อาชีพภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-}).allow(null);
+const occupationSchema = flexibleMultilingualSchema(100, false);
 
 /**
- * Schema สำหรับตรวจสอบสิทธิการรักษา (แก้ไขเป็น multilingual - optional)
+ * Schema สำหรับตรวจสอบสิทธิการรักษา (รองรับทั้ง string และ multilingual - optional)
  */
-const medicalRightsSchema = Joi.object({
-    th: Joi.string().trim().max(100).allow('').messages({
-        'string.max': 'สิทธิการรักษาต้องไม่เกิน {#limit} ตัวอักษร',
-    }),
-    en: Joi.string().trim().max(100).allow('').messages({
-        'string.max': 'สิทธิการรักษาภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-}).allow(null);
+const medicalRightsSchema = flexibleMultilingualSchema(100, false);
 
 /**
- * Schema สำหรับตรวจสอบสถานภาพ (แก้ไขเป็น multilingual - optional)
+ * Schema สำหรับตรวจสอบสถานภาพ (รองรับทั้ง string และ multilingual - optional)
  */
-const maritalStatusSchema = Joi.object({
-    th: Joi.string().trim().max(50).allow('').messages({
-        'string.max': 'สถานภาพต้องไม่เกิน {#limit} ตัวอักษร',
-    }),
-    en: Joi.string().trim().max(50).allow('').messages({
-        'string.max': 'สถานภาพภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-}).allow(null);
+const maritalStatusSchema = flexibleMultilingualSchema(50, false);
 
 /**
- * Schema สำหรับตรวจสอบช่องทางที่รู้จัก (แก้ไขเป็น multilingual - optional)
+ * Schema สำหรับตรวจสอบช่องทางที่รู้จัก (รองรับทั้ง string และ multilingual - optional)
  */
-const referralSourceSchema = Joi.object({
-    th: Joi.string().trim().max(100).allow('').messages({
-        'string.max': 'ช่องทางที่รู้จักต้องไม่เกิน {#limit} ตัวอักษร',
-    }),
-    en: Joi.string().trim().max(100).allow('').messages({
-        'string.max': 'ช่องทางที่รู้จักภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
-    })
-}).allow(null);
+const referralSourceSchema = flexibleMultilingualSchema(100, false);
 
 /**
  * Schema สำหรับตรวจสอบที่อยู่
@@ -263,12 +215,12 @@ export const createPatient = {
             'string.pattern.base': 'เลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น',
             'any.required': 'กรุณาระบุเลขบัตรประชาชน',
         }),
-        
-        // ข้อมูลหลายภาษา - เปลี่ยนเป็น multilingual
-        nationality: nationalitySchema.required().messages({
+
+        // ข้อมูลหลายภาษา - รองรับทั้ง string และ multilingual object
+        nationality: nationalitySchema.messages({
             'any.required': 'กรุณาระบุสัญชาติ',
         }),
-        titlePrefix: titlePrefixSchema.required().messages({
+        titlePrefix: titlePrefixSchema.messages({
             'any.required': 'กรุณาระบุคำนำหน้าชื่อ',
         }),
         firstName: firstNameSchema.required().messages({
@@ -277,13 +229,13 @@ export const createPatient = {
         lastName: lastNameSchema.required().messages({
             'any.required': 'กรุณาระบุนามสกุล',
         }),
-        gender: genderSchema.required().messages({
+        gender: genderSchema.messages({
             'any.required': 'กรุณาระบุเพศ',
         }),
-        patientType: patientTypeSchema.required().messages({
+        patientType: patientTypeSchema.messages({
             'any.required': 'กรุณาระบุประเภทผู้ป่วย',
         }),
-        
+
         // ข้อมูลเสริม (optional)
         nickname: Joi.string().trim().max(50).allow('').messages({
             'string.max': 'ชื่อเล่นต้องไม่เกิน {#limit} ตัวอักษร',
@@ -340,15 +292,21 @@ export const updatePatient = {
         id: commonValidations.objectId.required(),
     }),
     body: Joi.object({
-        // ข้อมูลหลายภาษา (Partial updates)
-        nationality: Joi.object({
-            th: Joi.string().trim().max(50),
-            en: Joi.string().trim().max(50).allow('')
-        }),
-        titlePrefix: Joi.object({
-            th: Joi.string().trim().max(20),
-            en: Joi.string().trim().max(20).allow('')
-        }),
+        // ข้อมูลหลายภาษา (Partial updates) - รองรับทั้ง string และ multilingual object
+        nationality: Joi.alternatives().try(
+            Joi.string().trim().max(50),
+            Joi.object({
+                th: Joi.string().trim().max(50),
+                en: Joi.string().trim().max(50).allow('')
+            })
+        ),
+        titlePrefix: Joi.alternatives().try(
+            Joi.string().trim().max(20),
+            Joi.object({
+                th: Joi.string().trim().max(20),
+                en: Joi.string().trim().max(20).allow('')
+            })
+        ),
         firstName: Joi.object({
             th: Joi.string().trim().max(100),
             en: Joi.string().trim().max(100).allow('')
@@ -357,35 +315,56 @@ export const updatePatient = {
             th: Joi.string().trim().max(100),
             en: Joi.string().trim().max(100).allow('')
         }),
-        gender: Joi.object({
-            th: Joi.string().trim().max(20),
-            en: Joi.string().trim().max(20).allow('')
-        }),
-        patientType: Joi.object({
-            th: Joi.string().trim().max(50),
-            en: Joi.string().trim().max(50).allow('')
-        }),
-        bloodGroup: Joi.object({
-            th: Joi.string().trim().max(10).allow(''),
-            en: Joi.string().trim().max(10).allow('')
-        }).allow(null),
-        occupation: Joi.object({
-            th: Joi.string().trim().max(100).allow(''),
-            en: Joi.string().trim().max(100).allow('')
-        }).allow(null),
-        medicalRights: Joi.object({
-            th: Joi.string().trim().max(100).allow(''),
-            en: Joi.string().trim().max(100).allow('')
-        }).allow(null),
-        maritalStatus: Joi.object({
-            th: Joi.string().trim().max(50).allow(''),
-            en: Joi.string().trim().max(50).allow('')
-        }).allow(null),
-        referralSource: Joi.object({
-            th: Joi.string().trim().max(100).allow(''),
-            en: Joi.string().trim().max(100).allow('')
-        }).allow(null),
-        
+        gender: Joi.alternatives().try(
+            Joi.string().trim().max(20),
+            Joi.object({
+                th: Joi.string().trim().max(20),
+                en: Joi.string().trim().max(20).allow('')
+            })
+        ),
+        patientType: Joi.alternatives().try(
+            Joi.string().trim().max(50),
+            Joi.object({
+                th: Joi.string().trim().max(50),
+                en: Joi.string().trim().max(50).allow('')
+            })
+        ),
+        bloodGroup: Joi.alternatives().try(
+            Joi.string().trim().max(10).allow(''),
+            Joi.object({
+                th: Joi.string().trim().max(10).allow(''),
+                en: Joi.string().trim().max(10).allow('')
+            })
+        ).allow(null),
+        occupation: Joi.alternatives().try(
+            Joi.string().trim().max(100).allow(''),
+            Joi.object({
+                th: Joi.string().trim().max(100).allow(''),
+                en: Joi.string().trim().max(100).allow('')
+            })
+        ).allow(null),
+        medicalRights: Joi.alternatives().try(
+            Joi.string().trim().max(100).allow(''),
+            Joi.object({
+                th: Joi.string().trim().max(100).allow(''),
+                en: Joi.string().trim().max(100).allow('')
+            })
+        ).allow(null),
+        maritalStatus: Joi.alternatives().try(
+            Joi.string().trim().max(50).allow(''),
+            Joi.object({
+                th: Joi.string().trim().max(50).allow(''),
+                en: Joi.string().trim().max(50).allow('')
+            })
+        ).allow(null),
+        referralSource: Joi.alternatives().try(
+            Joi.string().trim().max(100).allow(''),
+            Joi.object({
+                th: Joi.string().trim().max(100).allow(''),
+                en: Joi.string().trim().max(100).allow('')
+            })
+        ).allow(null),
+
         nickname: Joi.string().trim().max(50).allow('').messages({
             'string.max': 'ชื่อเล่นต้องไม่เกิน {#limit} ตัวอักษร',
         }),
@@ -535,8 +514,8 @@ export const getAllPatients = {
             'any.only': 'ภาษาต้องเป็น th หรือ en เท่านั้น'
         }),
         branchId: commonValidations.objectId.optional(),
-        
-        // ปรับ query params ให้เป็น string เนื่องจากใน response จะใช้ getMultilingualValue แปลงตามภาษา
+
+        // Filter parameters - รองรับทั้ง string และ multilingual object
         patientType: Joi.string().trim().max(50).messages({
             'string.max': 'ประเภทผู้ป่วยต้องไม่เกิน {#limit} ตัวอักษร'
         }),
@@ -630,11 +609,24 @@ export const updatePatientOptions = {
     }),
     body: Joi.object({
         values: Joi.array().items(
-            Joi.string().trim().max(100).required().messages({
-                'string.empty': 'ค่าตัวเลือกต้องไม่เป็นค่าว่าง',
-                'string.max': 'ค่าตัวเลือกต้องไม่เกิน {#limit} ตัวอักษร',
-                'any.required': 'กรุณาระบุค่าตัวเลือก'
-            })
+            // รองรับทั้ง string และ multilingual object
+            Joi.alternatives().try(
+                Joi.string().trim().max(100).required().messages({
+                    'string.empty': 'ค่าตัวเลือกต้องไม่เป็นค่าว่าง',
+                    'string.max': 'ค่าตัวเลือกต้องไม่เกิน {#limit} ตัวอักษร',
+                    'any.required': 'กรุณาระบุค่าตัวเลือก'
+                }),
+                Joi.object({
+                    th: Joi.string().required().trim().max(100).messages({
+                        'string.empty': 'กรุณาระบุข้อมูลภาษาไทย',
+                        'string.max': 'ข้อมูลภาษาไทยต้องไม่เกิน {#limit} ตัวอักษร',
+                        'any.required': 'กรุณาระบุข้อมูลภาษาไทย',
+                    }),
+                    en: Joi.string().trim().max(100).allow('').messages({
+                        'string.max': 'ข้อมูลภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
+                    })
+                })
+            )
         ).min(1).required().messages({
             'array.min': 'กรุณาระบุค่าอย่างน้อย 1 ค่า',
             'array.base': 'ค่าตัวเลือกต้องเป็น array',
@@ -651,11 +643,29 @@ export const addPatientOptionValue = {
         category: patientOptionCategoryValidation,
     }),
     body: Joi.object({
-        value: Joi.string().trim().max(100).required().messages({
-            'string.empty': 'กรุณาระบุค่าที่ต้องการเพิ่ม',
-            'string.max': 'ค่าตัวเลือกต้องไม่เกิน {#limit} ตัวอักษร',
-            'any.required': 'กรุณาระบุค่าที่ต้องการเพิ่ม'
+        // รองรับหลายรูปแบบการส่งข้อมูล
+        value: Joi.alternatives().try(
+            Joi.string().trim().max(100),
+            Joi.object({
+                th: Joi.string().required().trim().max(100).messages({
+                    'string.empty': 'กรุณาระบุข้อมูลภาษาไทย',
+                    'string.max': 'ข้อมูลภาษาไทยต้องไม่เกิน {#limit} ตัวอักษร',
+                    'any.required': 'กรุณาระบุข้อมูลภาษาไทย',
+                }),
+                en: Joi.string().trim().max(100).allow('').messages({
+                    'string.max': 'ข้อมูลภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
+                })
+            })
+        ),
+        // Alternative format - separate th/en fields
+        th: Joi.string().trim().max(100).messages({
+            'string.max': 'ข้อมูลภาษาไทยต้องไม่เกิน {#limit} ตัวอักษร',
+        }),
+        en: Joi.string().trim().max(100).allow('').messages({
+            'string.max': 'ข้อมูลภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
         })
+    }).or('value', 'th').messages({
+        'object.missing': 'กรุณาระบุข้อมูลตัวเลือกที่ต้องการเพิ่ม (value หรือ th)',
     }),
 };
 
@@ -682,7 +692,19 @@ export const createPatientOptions = {
         }),
         category: patientOptionCategoryValidation,
         values: Joi.array().items(
-            Joi.string().trim().max(100).required()
+            Joi.alternatives().try(
+                Joi.string().trim().max(100).required(),
+                Joi.object({
+                    th: Joi.string().required().trim().max(100).messages({
+                        'string.empty': 'กรุณาระบุข้อมูลภาษาไทย',
+                        'string.max': 'ข้อมูลภาษาไทยต้องไม่เกิน {#limit} ตัวอักษร',
+                        'any.required': 'กรุณาระบุข้อมูลภาษาไทย',
+                    }),
+                    en: Joi.string().trim().max(100).allow('').messages({
+                        'string.max': 'ข้อมูลภาษาอังกฤษต้องไม่เกิน {#limit} ตัวอักษร',
+                    })
+                })
+            )
         ).min(1).required().messages({
             'array.min': 'กรุณาระบุค่าอย่างน้อย 1 ค่า',
             'array.base': 'ค่าตัวเลือกต้องเป็น array',

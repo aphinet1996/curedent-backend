@@ -189,9 +189,13 @@ export const deleteBranch = catchAsync(async (req: Request, res: Response, next:
     return next(new AppError('ไม่พบข้อมูลสาขานี้', 404));
   }
   
-  if (req.user!.roles !== UserRole.SUPER_ADMIN && 
-      branch.clinicId.toString() !== req.user!.clinicId?.toString()) {
-    return next(new AppError('คุณไม่มีสิทธิ์ลบสาขานี้', 403));
+  // if (req.user!.roles !== UserRole.SUPER_ADMIN && 
+  //     branch.clinicId.toString() !== req.user!.clinicId?.toString()) {
+  //   return next(new AppError('คุณไม่มีสิทธิ์ลบสาขานี้', 403));
+  // }
+
+  if (!hasClinicAccess(req.user!.roles, req.user!.clinicId, branch.clinicId)) {
+    return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลสาขานี้', 403));
   }
   
   await branchService.deleteBranch(branchId);
