@@ -98,10 +98,8 @@ export const hasClinicAccess = (
   userClinicId: any,
   targetClinicId: any
 ): boolean => {
-  // Super admin เข้าถึงได้ทุกอย่าง
   if (userRole === 'superAdmin') return true;
 
-  // Owner เข้าถึงได้เฉพาะคลินิกตัวเอง
   if (userRole === 'owner') {
     return compareObjectIds(userClinicId, targetClinicId);
   }

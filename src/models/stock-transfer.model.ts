@@ -1,6 +1,6 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import { IStockTransferDocument, IStockTransferModel, TransferStatus } from '../types/stock.types';
-import { compareObjectIds } from '../utils/mogoose.utils';
+import { compareObjectIds } from '../utils/mongoose.utils';
 
 // Interface สำหรับ Model ที่รวม static methods
 interface IStockTransferModelWithStatics extends Model<IStockTransferDocument>, IStockTransferModel {}

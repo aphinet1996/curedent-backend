@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from './error.middleware';
 import { UserRole } from '../types/user.types';
-import { hasClinicAccess, hasBranchAccess } from '../utils/mogoose.utils';
+import { hasClinicAccess, hasBranchAccess } from '../utils/mongoose.utils';
 
 export const checkRole = (roles: UserRole[]) => {
   return (req: Request, res: Response, next: NextFunction) => {

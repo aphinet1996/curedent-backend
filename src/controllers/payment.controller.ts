@@ -3,7 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { PaymentService } from '../services/payment.service';
 import { toPaymentResponse, toPaymentTransactionResponse } from '../types/payment.types';
 import { UserRole } from '../types/user.types';
-import { compareObjectIds } from '../utils/mogoose.utils';
+import { compareObjectIds } from '../utils/mongoose.utils';
 
 const paymentService = new PaymentService();
 

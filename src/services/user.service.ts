@@ -12,7 +12,7 @@ import {
   UserStatus,
   UserRole
 } from '../types/user.types';
-import { hasClinicAccess, hasBranchAccess } from '../utils/mogoose.utils';
+import { hasClinicAccess, hasBranchAccess } from '../utils/mongoose.utils';
 
 export class UserService {
   /**

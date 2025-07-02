@@ -7,7 +7,7 @@ import {
   calculateAge,
   createMultilingualFullName,
   IMultilingualText
-} from '../utils/mogoose.utils';
+} from '../utils/mongoose.utils';
 
 /**
  * Interface สำหรับที่อยู่
@@ -401,4 +401,4 @@ export {
     getMultilingualValue, 
     calculateAge, 
     IMultilingualText 
-} from '../utils/mogoose.utils';
+} from '../utils/mongoose.utils';

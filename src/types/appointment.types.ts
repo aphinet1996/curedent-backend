@@ -452,7 +452,7 @@ import {
   getPopulatedPatientPhone,
   getPopulatedPatientEmail,
   getPopulatedUserInfo
-} from '../utils/mogoose.utils';
+} from '../utils/mongoose.utils';
 
 /**
  * สถานะการนัดหมาย

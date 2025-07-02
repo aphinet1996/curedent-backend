@@ -72,11 +72,11 @@ export const populateUserDetails = async (req: Request, res: Response, next: Nex
 export const authorizeRoles = (roles: UserRole[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new AppError('กรุณาเข้าสู่ระบบเพื่อเข้าถึงทรัพยากรนี้', 401));
+      return next(new AppError('กรุณาเข้าสู่ระบบ', 401));
     }
 
     if (!roles.includes(req.user.roles)) {
-      return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงทรัพยากรนี้', 403));
+      return next(new AppError('คุณไม่มีสิทธิ์เข้าถึง', 403));
     }
 
     next();

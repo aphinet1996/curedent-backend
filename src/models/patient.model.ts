@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { IPatientDocument, IAddress, IEmergencyContact, IMedicalInfo, IHNCounter } from '../types/patient.types';
-import { IMultilingualText, calculateAge } from '../utils/mogoose.utils';
+import { IMultilingualText, calculateAge } from '../utils/mongoose.utils';
 
 // Schema สำหรับข้อมูลหลายภาษา
 const multilingualTextSchema = new Schema<IMultilingualText>({

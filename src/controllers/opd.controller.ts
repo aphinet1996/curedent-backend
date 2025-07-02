@@ -3,7 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { OpdService } from '../services/opd.service';
 import { toOpdResponse, opdResponseBuilders } from '../types/opd.types';
 import { UserRole } from '../types/user.types';
-import { hasClinicAccess } from '../utils/mogoose.utils';
+import { hasClinicAccess } from '../utils/mongoose.utils';
 
 const opdService = new OpdService();
 

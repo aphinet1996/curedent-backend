@@ -3,7 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { AssistantService } from '../services/assistans.service';
 import { toAssistantResponse, assistantResponseBuilders, AssistantOptionResponse } from '../types/assistant.types';
 import { UserRole } from '../types/user.types';
-import { getObjectIdString } from '../utils/mogoose.utils';
+import { getObjectIdString } from '../utils/mongoose.utils';
 
 const assistantService = new AssistantService();
 

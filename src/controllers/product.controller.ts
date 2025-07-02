@@ -4,7 +4,7 @@ import { ProductService } from '../services/product.service';
 import { toProductResponse } from '../types/product.types';
 import { toStockResponse } from '../types/stock.types';
 import { UserRole } from '../types/user.types';
-import { compareObjectIds } from '../utils/mogoose.utils';
+import { compareObjectIds } from '../utils/mongoose.utils';
 
 const productService = new ProductService();
 

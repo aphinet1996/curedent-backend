@@ -7,7 +7,7 @@ import {
   toStockTransferResponse,
 } from '../types/stock.types';
 import { UserRole } from '../types/user.types';
-import { compareObjectIds } from '../utils/mogoose.utils';
+import { compareObjectIds } from '../utils/mongoose.utils';
 
 const stockService = new StockService();
 

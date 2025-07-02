@@ -3,7 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { TreatmentService } from '../services/treatment.service';
 import { toTreatmentResponse } from '../types/treatment.types';
 import { UserRole } from '../types/user.types';
-import { hasClinicAccess } from '../utils/mogoose.utils';
+import { hasClinicAccess } from '../utils/mongoose.utils';
 
 const treatmentService = new TreatmentService();
 

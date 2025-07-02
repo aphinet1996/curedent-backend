@@ -3,7 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { AppointmentService } from '../services/appointment.service';
 import { toAppointmentResponse, AppointmentStatus } from '../types/appointment.types';
 import { UserRole } from '../types/user.types';
-import { getObjectIdString } from '../utils/mogoose.utils'; // เพิ่ม import
+import { getObjectIdString } from '../utils/mongoose.utils'; // เพิ่ม import
 
 const appointmentService = new AppointmentService();
 

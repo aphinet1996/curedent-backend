@@ -3,7 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { BranchService } from '../services/branch.service';
 import { toBranchResponse } from '../types/branch.types';
 import { UserRole } from '../types/user.types';
-import { hasClinicAccess } from '../utils/mogoose.utils';
+import { hasClinicAccess } from '../utils/mongoose.utils';
 
 const branchService = new BranchService();
 
