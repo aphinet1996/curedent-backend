@@ -1,4 +1,3 @@
-// services/drug.service.ts
 import { AppError } from '../middlewares/error.middleware';
 import { logger } from '../utils/logger';
 import { Drug } from '../models/drug.model';
@@ -26,7 +25,7 @@ export class DrugService {
         try {
             // ใช้ clinicId จาก parameter หรือจาก drugData
             const effectiveClinicId = clinicId || drugData.clinicId;
-            
+
             if (!effectiveClinicId) {
                 throw new AppError('กรุณาระบุ clinic ID', 400);
             }
@@ -71,9 +70,9 @@ export class DrugService {
             }
 
             const drug = await Drug.findOne(query)
-                .populate('createdBy updatedBy', 'firstName lastName')
-                .populate('clinicId', 'name')
-                .populate('branchId', 'name');
+                // .populate('createdBy updatedBy', 'firstName lastName')
+                // .populate('clinicId', 'name')
+                // .populate('branchId', 'name');
 
             return drug;
         } catch (error) {
@@ -310,16 +309,6 @@ export class DrugService {
     }
 
     /**
-     * ดึงยาที่ stock ต่ำ - REMOVED (ไว้เพิ่มทีหลัง)
-     */
-    // async getLowStockDrugs(clinicId: string, branchId?: string): Promise<IDrugDocument[]> { ... }
-
-    /**
-     * อัปเดต stock ยา - REMOVED (ไว้เพิ่มทีหลัง)
-     */
-    // async updateStock(...): Promise<IDrugDocument> { ... }
-
-    /**
      * ตั้งค่าข้อมูลหลายภาษาสำหรับฉลากยา
      */
     async setDrugLabelConfig(
@@ -480,8 +469,6 @@ export class DrugService {
                     ราคาขาย: drug.sellingPrice,
                     ราคาซื้อ: drug.purchasePrice || '',
                     สถานะ: drug.isActive ? 'ใช้งาน' : 'ไม่ใช้งาน'
-                    // จำนวนคงเหลือ: drug.stockQuantity || 0, - REMOVED
-                    // จำนวนขั้นต่ำ: drug.minimumStock || 0, - REMOVED
                 };
 
                 // Add multilingual data if requested

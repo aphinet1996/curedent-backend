@@ -1,4 +1,3 @@
-// routes/drug-options.routes.ts
 import { Router } from 'express';
 import { authenticateToken, authorizeRoles } from '../middlewares/auth.middleware';
 import { validate } from '../middlewares/validation.middleware';
@@ -8,7 +7,6 @@ import { UserRole } from '../types/user.types';
 
 const router = Router();
 
-// Middleware สำหรับทุกเส้นทาง - ต้องได้รับการยืนยันตัวตน
 router.use(authenticateToken);
 
 /**

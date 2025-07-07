@@ -12,19 +12,19 @@ export type DrugOptionCategory =
 
 // Interface สำหรับข้อมูลหลายภาษาแบบ extended
 export interface IDrugMultilingualText {
-  th?: string;    // ภาษาไทย
-  en?: string;    // ภาษาอังกฤษ
-  [key: string]: string | undefined; // รองรับภาษาอื่นๆ เช่น zh, ja, etc.
+  th?: string;
+  en?: string;
+  [key: string]: string | undefined;
 }
 
 // Interface สำหรับ Drug Options Document
 export interface IDrugOptionsDocument extends Document {
   clinicId?: Types.ObjectId | string;
-  branchId?: Types.ObjectId | string;     // รองรับหลายสาขา
+  branchId?: Types.ObjectId | string;
   category: DrugOptionCategory;
   values: IMultilingualOption[];
   isActive: boolean;
-  isDefault: boolean;    // ข้อมูลเริ่มต้นของระบบ
+  isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,7 +32,7 @@ export interface IDrugOptionsDocument extends Document {
 // Interface สำหรับ Drug Label Settings (ตั้งค่าฉลากยา)
 export interface IDrugLabelSettings {
   drugId: Types.ObjectId | string;
-  languages: string[];   // ['th', 'en', 'zh'] ภาษาที่ต้องการแสดงในฉลาก
+  languages: string[];
   customLabels: {
     scientificName?: IDrugMultilingualText;
     printName?: IDrugMultilingualText;
@@ -114,12 +114,12 @@ export interface IDrugSearchFilter {
     min?: number;
     max?: number;
   };
-  searchTerm?: string;       // ค้นหาทั่วไป
+  searchTerm?: string;
 }
 
 // Interface สำหรับการสร้าง/อัปเดต Drug
 export interface IDrugCreateInput {
-  clinicId?: string; // เพิ่ม clinicId (optional เพราะจะ set จาก user context)
+  clinicId?: string;
   branchId?: string;
   drugCode: string;
   drugName: string;

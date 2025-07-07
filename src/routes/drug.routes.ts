@@ -1,4 +1,3 @@
-// routes/drug.routes.ts
 import { Router } from 'express';
 import { authenticateToken, authorizeRoles } from '../middlewares/auth.middleware';
 import { validate } from '../middlewares/validation.middleware';
@@ -8,10 +7,7 @@ import { UserRole } from '../types/user.types';
 
 const router = Router();
 
-// Middleware สำหรับทุกเส้นทาง - ต้องได้รับการยืนยันตัวตน
 router.use(authenticateToken);
-
-// ============= Search and Lookup Routes =============
 
 /**
  * @route   GET /api/v1/drugs/search
@@ -56,8 +52,6 @@ router.get(
   drugController.getDropdownOptions
 );
 
-// ============= Category and Stock Routes =============
-
 /**
  * @route   GET /api/v1/drugs/category/:category
  * @desc    ดึงข้อมูลยาตามหมวดหมู่
@@ -68,15 +62,6 @@ router.get(
   validate(drugValidation.getDrugsByCategory),
   drugController.getDrugsByCategory
 );
-
-/**
- * @route   GET /api/v1/drugs/low-stock
- * @desc    ดึงยาที่ stock ต่ำ - REMOVED (ไว้เพิ่มทีหลัง)
- * @access  Private
- */
-// router.get('/low-stock', validate(drugValidation.getLowStockDrugs), drugController.getLowStockDrugs);
-
-// ============= Export and Bulk Operations Routes =============
 
 /**
  * @route   GET /api/v1/drugs/export
@@ -101,8 +86,6 @@ router.post(
   validate(drugValidation.bulkOperations),
   drugController.bulkOperations
 );
-
-// ============= Main CRUD Routes =============
 
 /**
  * @route   GET /api/v1/drugs
@@ -160,15 +143,6 @@ router.delete(
   drugController.deleteDrug
 );
 
-// ============= Stock Management Routes - REMOVED (ไว้เพิ่มทีหลัง) =============
-
-/**
- * @route   PATCH /api/v1/drugs/:id/stock
- * @desc    อัปเดต stock ยา - REMOVED
- * @access  Private (Manager+)
- */
-// router.patch('/:id/stock', authorizeRoles([...]), validate(drugValidation.updateDrugStock), drugController.updateDrugStock);
-
 /**
  * @route   PATCH /api/v1/drugs/:id/archive
  * @desc    Archive/Restore ยา
@@ -180,8 +154,6 @@ router.patch(
   validate(drugValidation.toggleArchiveStatus),
   drugController.toggleArchiveStatus
 );
-
-// ============= Label Configuration Routes =============
 
 /**
  * @route   PUT /api/v1/drugs/:id/label-config

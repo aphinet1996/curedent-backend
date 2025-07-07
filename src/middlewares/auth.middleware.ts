@@ -21,7 +21,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       : null;
 
     if (!token) {
-      return next(new AppError('กรุณาเข้าสู่ระบบเพื่อเข้าถึงทรัพยากรนี้', 401));
+      return next(new AppError('กรุณาเข้าสู่ระบบ', 401));
     }
 
     // ตรวจสอบ token
@@ -86,7 +86,7 @@ export const authorizeRoles = (roles: UserRole[]) => {
 export const authorizeOwnership = (getResourceUserId: (req: Request) => string) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new AppError('กรุณาเข้าสู่ระบบเพื่อเข้าถึงทรัพยากรนี้', 401));
+      return next(new AppError('กรุณาเข้าสู่ระบบ', 401));
     }
 
     const resourceUserId = getResourceUserId(req);
@@ -107,7 +107,7 @@ export const authorizeOwnership = (getResourceUserId: (req: Request) => string) 
 export const authorizeClinic = (getClinicId: (req: Request) => string | undefined) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new AppError('กรุณาเข้าสู่ระบบเพื่อเข้าถึงทรัพยากรนี้', 401));
+      return next(new AppError('กรุณาเข้าสู่ระบบ', 401));
     }
 
     if (req.user.roles === UserRole.SUPER_ADMIN) {
@@ -132,7 +132,7 @@ export const authorizeClinic = (getClinicId: (req: Request) => string | undefine
 export const authorizeBranch = (getBranchId: (req: Request) => string | undefined) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new AppError('กรุณาเข้าสู่ระบบเพื่อเข้าถึงทรัพยากรนี้', 401));
+      return next(new AppError('กรุณาเข้าสู่ระบบ', 401));
     }
 
     if (req.user.roles === UserRole.SUPER_ADMIN) {
@@ -166,7 +166,7 @@ export const authorizeBranch = (getBranchId: (req: Request) => string | undefine
 
 export const requireEmailVerification = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new AppError('กรุณาเข้าสู่ระบบเพื่อเข้าถึงทรัพยากรนี้', 401));
+    return next(new AppError('กรุณาเข้าสู่ระบบ', 401));
   }
 
   if (!req.user.emailVerified) {

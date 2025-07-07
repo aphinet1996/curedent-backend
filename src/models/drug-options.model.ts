@@ -35,9 +35,7 @@ const drugOptionsSchema = new Schema<IDrugOptionsDocument>(
       },
       validate: {
         validator: function(this: IDrugOptionsDocument, v: any) {
-          // ถ้าเป็น default options ไม่ต้องมี clinicId
           if (this.isDefault) return true;
-          // ถ้าไม่ใช่ default ต้องมี clinicId
           return v != null;
         },
         message: 'Default options ไม่ต้องระบุคลินิก, คลินิกเฉพาะต้องระบุคลินิก'
@@ -46,7 +44,7 @@ const drugOptionsSchema = new Schema<IDrugOptionsDocument>(
     branchId: {
       type: Schema.Types.ObjectId,
       ref: 'Branch',
-      required: false // Optional สำหรับอนาคตที่อาจมีหลายสาขา
+      required: false
     },
     category: {
       type: String,
@@ -72,7 +70,7 @@ const drugOptionsSchema = new Schema<IDrugOptionsDocument>(
     },
     isDefault: {
       type: Boolean,
-      default: false // ข้อมูลเริ่มต้นของระบบ
+      default: false
     }
   },
   {

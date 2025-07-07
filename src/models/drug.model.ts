@@ -12,7 +12,6 @@ interface IDrugModel extends Model<IDrugDocument> {
 const multilingualTextSchema = new Schema<IDrugMultilingualText>({
     th: { type: String, trim: true },
     en: { type: String, trim: true }
-    // เปิดโอกาสให้เพิ่มภาษาอื่นๆ ได้ เช่น zh, ja, etc.
 }, { 
     _id: false,
     strict: false // อนุญาตให้เพิ่มฟิลด์ภาษาอื่นๆ ได้
@@ -34,7 +33,6 @@ const drugSchema = new Schema<IDrugDocument>(
       index: true
     },
     
-    // ข้อมูลพื้นฐาน (required)
     drugCode: {
       type: String,
       required: [true, 'กรุณาระบุรหัสยา'],

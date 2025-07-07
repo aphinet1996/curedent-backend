@@ -3,6 +3,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { DrugService } from '../services/drug.service';
 import { DrugOptionsService } from '../services/drug-options.service';
 import { UserRole } from '../types/user.types';
+import { compareObjectIds } from '../utils/mongoose.utils';
 import {
     IDrugCreateInput,
     IDrugUpdateInput,
@@ -16,7 +17,7 @@ const drugOptionsService = new DrugOptionsService();
 
 const processMultilingualFormData = (data: any): any => {
     const processedData = { ...data };
-    
+
     const arrayFields = ['drugAllergies', 'chronicDiseases', 'currentMedications'];
     arrayFields.forEach(field => {
         if (processedData[field] && typeof processedData[field] === 'string') {
@@ -34,7 +35,7 @@ const processMultilingualFormData = (data: any): any => {
 export const getAllDrugs = catchAsync(async (req: Request, res: Response) => {
     const clinicId = req.user!.clinicId?.toString();
     const branchId = req.query.branchId?.toString();
-    
+
     if (!clinicId) {
         throw new AppError('กรุณาระบุ clinic ID', 400);
     }
@@ -83,7 +84,7 @@ export const getAllDrugs = catchAsync(async (req: Request, res: Response) => {
 export const searchDrugs = catchAsync(async (req: Request, res: Response) => {
     const clinicId = req.user!.clinicId?.toString();
     const searchTerm = req.query.q?.toString();
-    
+
     if (!clinicId) {
         throw new AppError('กรุณาระบุ clinic ID', 400);
     }
@@ -131,9 +132,10 @@ export const getDrugById = catchAsync(async (req: Request, res: Response, next: 
     if (!drug) {
         return next(new AppError('ไม่พบข้อมูลยานี้', 404));
     }
-
-    if (req.user!.roles !== UserRole.SUPER_ADMIN && 
-        drug.clinicId.toString() !== clinicId) {
+    if (req.user!.roles !== UserRole.SUPER_ADMIN &&
+        // drug.clinicId.toString() !== clinicId) 
+        !compareObjectIds(drug.clinicId, clinicId))
+        {
         return next(new AppError('คุณไม่มีสิทธิ์เข้าถึงข้อมูลยานี้', 403));
     }
 
@@ -324,7 +326,7 @@ export const exportDrugs = catchAsync(async (req: Request, res: Response, next: 
     const filename = `drugs_export_${timestamp}.${format}`;
 
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    
+
     if (format === 'json') {
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(exportData);
